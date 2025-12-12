@@ -92,4 +92,15 @@ def set_sidebar_background():
     """
     st.markdown(css, unsafe_allow_html=True)
 
+# ======================================
+# サイドバーのナビ上部タイトルを表示する
+# ======================================
 
+import streamlit as st
+
+def set_sidebar_nav_title(title: str = "メニュー"):
+    """サイドバーのナビ上部タイトルを表示する（簡易版）"""
+    st.sidebar.markdown(
+        f"<div style='font-size:14px; font-weight:700; margin: 8px 0 6px 0;'>{title}</div>",
+        unsafe_allow_html=True,
+    )
