@@ -6,20 +6,6 @@ st.set_page_config(
     page_icon="📖",
 )
 
-st.markdown("""
-<style>
-/* サイドバーのナビゲーションタイトルを書き換える */
-[data-testid="stSidebarNav"] > div:first-child {
-    font-size: 0;  /* もともとの「app」を見えなくする */
-}
-
-[data-testid="stSidebarNav"] > div:first-child::before {
-    content: "メニュー";
-    font-size: 1rem;
-    font-weight: 600;
-}
-</style>
-""", unsafe_allow_html=True)
 
 set_background("assets/background/bg_washi.png")
 set_main_card_style(padding_top=2.2)
