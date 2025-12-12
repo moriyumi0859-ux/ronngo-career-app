@@ -1,5 +1,5 @@
 import streamlit as st
-from constants import (set_background, set_main_card_style, set_sidebar_background,set_sidebar_nav_title)
+from utils.constants import (set_background, set_main_card_style, set_sidebar_background,set_sidebar_nav_title)
 
 st.set_page_config(
     page_title="論語 × キャリア成長ラボ",

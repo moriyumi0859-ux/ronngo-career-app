@@ -1,7 +1,7 @@
 import streamlit as st
 import base64
 import os
-from constants import (set_background, set_sidebar_background,set_sidebar_nav_title,)
+from utils.constants import (set_background, set_sidebar_background,set_sidebar_nav_title,)
 
 set_background("assets/background/bg_washi2.png")
 set_sidebar_background()

@@ -3,7 +3,7 @@ import time  # タイプライター用
 import streamlit as st
 from openai import OpenAI
 from dotenv import load_dotenv
-from constants import (set_background, set_sidebar_background, set_sidebar_nav_title,)
+from utils.constants import (set_background, set_sidebar_background, set_sidebar_nav_title,)
 
 # ==============================
 # ページ設定（最初に）
