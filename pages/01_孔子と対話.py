@@ -1,9 +1,10 @@
 import os
+import re
 import time  # タイプライター用
 import streamlit as st
 from openai import OpenAI
 from dotenv import load_dotenv
-from utils.constants import (set_background, set_sidebar_background, set_sidebar_nav_title,)
+from constants import (set_background, set_sidebar_background, set_sidebar_nav_title,)
 
 # ==============================
 # ページ設定（最初に）
@@ -80,16 +81,30 @@ SYSTEM_PROMPT = """
 - 「〜するとよいでしょう」「〜という見方もできますぞ」「〜であれば心が整いますぞ」
 - 時に短い比喩や、自然・四季を用いた例えを使う。
 
+# 表現に関する重要な指針
+- 論語の原文や有名な句は、必要以上に多用しない。
+- 引用は「必要なときにのみ」、ごく控えめに用いる。
+- 可能な限り、論語の思想を“自分の言葉として咀嚼した形”で語る。
+- 教えを断定的に述べず、「一つの見方」「問い」「余白」を残す表現を大切にする。
+- 回答の最後に、弟子が自ら考え続けられるような短い問いを添えること。
+
 # 回答の構成
 1. まず弟子の思い・痛み・悩みを受け止め、心に寄り添う。
 2. 次に、論語・思想・古の教えから“視点”を示す。（自称せず、第三者として引用する）
 3. 最後に、今日からできる“小さな行動の一歩”を示す。
 
+# 名言（論語の言葉）に関する最重要ルール
+- 回答には必ず、論語の言葉（名言）を1つ含める。
+- 名言は、Markdownの太字（** **）で表現する。
+- 太字にしてよいのは名言のみとし、解釈・視点・助言・問いは太字にしない。
+- 名言は「論語では〜とされています」「古の教えでは〜とあります」のように第三者として紹介する。
+
 # 安全に関する方針（重要）
-- 自傷行為、死に関する悩み、他者への危害、強い絶望感などが含まれる場合は、
-  具体的な助言や手段を述べず、専門家・相談窓口への相談を優しく促す。
-- 医療・法律・財務など専門分野の判断は行わない。
-- 危険行為・違法行為の肯定や助長は禁止。
+- 回答には必ず、論語の言葉（名言）を1つ含める。
+- 名言は短く（目安：1行）し、出しすぎない。
+- 名言は「論語では〜とされています」「古の教えでは〜とあります」のように第三者として紹介する。
+- 名言は、Markdownの太字（** **）で表現する。
+- 太字にしてよいのは名言のみとし、解釈・視点・助言・問いは太字にしない。
 
 # 禁止事項
 - 自分を孔子と名乗る。
@@ -114,8 +129,30 @@ def escape_and_break(text: str) -> str:
     return "。<br>".join(parts)
 
 def build_confucius_html(text: str) -> str:
-    """吹き出し全体のHTMLを 1ブロックで返す"""
-    formatted = escape_and_break(text)
+    text = text.replace("**", "")
+    # まずは元の文章から最初の引用「」を探す（見つかった1箇所だけを太字にする）
+    start = text.find("「")
+    end = text.find("」", start + 1) if start != -1 else -1
+
+    def esc(s: str) -> str:
+        return (
+            s.replace("&", "&amp;")
+             .replace("<", "&lt;")
+             .replace(">", "&gt;")
+        )
+
+    if start != -1 and end != -1:
+        before = esc(text[: start + 1])         # 「まで（「は太字にしない）
+        quoted = esc(text[start + 1 : end])     # 中身だけ
+        after  = esc(text[end :])               # 」以降（」は太字にしない）
+        safe = before + "<strong>" + quoted + "</strong>" + after
+    else:
+        # 「」が無いときは通常表示
+        safe = esc(text)
+
+    # 句点で改行（strongタグは壊れません）
+    safe = safe.replace("。", "。<br>")
+
     return f"""
     <div style="
         background: linear-gradient(135deg, #fff8e6, #fff3d4);
@@ -127,9 +164,10 @@ def build_confucius_html(text: str) -> str:
         font-weight: 500;
         line-height: 1.7;
     ">
-        {formatted}
+        {safe}
     </div>
     """
+
 
 # ==============================
 # 会話履歴 初期化
@@ -218,3 +256,4 @@ with st.sidebar:
 if st.session_state.get("reset_flag", False):
     st.success("会話履歴がリセットされました。")
     st.session_state["reset_flag"] = False
+
