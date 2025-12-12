@@ -96,11 +96,25 @@ def set_sidebar_background():
 # サイドバーのナビ上部タイトルを表示する
 # ======================================
 
-import streamlit as st
-
+# sidebar nav title helper (force rebuild)
 def set_sidebar_nav_title(title: str = "メニュー"):
-    """サイドバーのナビ上部タイトルを表示する（簡易版）"""
-    st.sidebar.markdown(
-        f"<div style='font-size:14px; font-weight:700; margin: 8px 0 6px 0;'>{title}</div>",
-        unsafe_allow_html=True,
-    )
+    css = f"""
+    <style>
+    /* サイドバー全体の一番上に固定でタイトルを出す */
+    [data-testid="stSidebar"]::before {{
+        content: "{title}";
+        display: block;
+        padding: 12px 12px 6px 12px;
+        font-size: 14px;
+        font-weight: 800;
+        color: #333;
+    }}
+
+    /* ナビがタイトルに被らないように少し下げる（必要なら調整） */
+    [data-testid="stSidebarNav"] {{
+        margin-top: 0.25rem;
+    }}
+    </style>
+    """
+    st.markdown(css, unsafe_allow_html=True)
+
